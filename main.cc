@@ -36,6 +36,7 @@ Point2f fit_point(const int rows, const int cols, Mat mat_3b1) {
 };
 
 int main() {
+    // hardcoded config
     std::string base_path = "./eval";
 
     const auto fx = 718.856;
@@ -49,6 +50,8 @@ int main() {
     const auto tw = 800;
     const auto th = 800;
 
+    const auto scale = 0.8;
+
     auto camera = Camera(fx, fy, cx, cy);
 
     std::vector<std::string> fns;
@@ -57,7 +60,7 @@ int main() {
     }
     std::sort(fns.begin(), fns.end());
 
-    auto vo = VisualOdometry(camera, 0.8);
+    auto vo = VisualOdometry(camera, scale);
 
     cv::Mat map = Mat::zeros(tw, th, CV_8UC3);
 
