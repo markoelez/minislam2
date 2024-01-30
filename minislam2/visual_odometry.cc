@@ -36,11 +36,6 @@ std::tuple<cv::Mat, cv::Mat> VisualOdometry::estimate_pose() {
     cur_pts = denormalize(camera.K, cur_pts);
     ref_pts = denormalize(camera.K, ref_pts);
 
-    // for (size_t i = 0; i < 10; ++i) {
-    //     std::cout << cur_pts[i] << std::endl;
-    // }
-    // std::cout << std::string(30, '*') << std::endl;
-
     // Compute the essential matrix using the identity camera matrix.
     Mat E = cv::findEssentialMat(cur_pts, ref_pts, 1.0, Point2d(0, 0), RANSAC, 0.999, 0.003);
 

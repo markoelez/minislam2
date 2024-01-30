@@ -37,7 +37,7 @@ Point2f fit_point(const int rows, const int cols, Mat mat_3b1) {
 
 int main() {
     // hardcoded config
-    std::string base_path = "./eval/test";
+    std::string base_path = "../eval/test";
 
     const auto fx = 718.856;
     const auto fy = 718.856;

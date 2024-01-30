@@ -6,7 +6,9 @@ Note: This is a rewrite of https://github.com/markoelez/minislam.
 
 ### Usage
 
-run the following for a quick example:
+build:
 ```sh
-make && make run
+mkdir build && cd build
+cmake ..
+cmake --build .
 ```
