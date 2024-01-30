@@ -1,4 +1,4 @@
-#include "feature_manager.hpp"
+#include "feature_manager.h"
 
 #include "opencv2/features2d.hpp"
 

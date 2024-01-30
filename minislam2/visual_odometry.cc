@@ -1,9 +1,9 @@
-#include "visual_odometry.hpp"
+#include "visual_odometry.h"
 
 #include <iostream>
 #include <opencv2/calib3d.hpp>
 
-#include "util.hpp"
+#include "util.h"
 
 void VisualOdometry::process(Mat img) {
     cur_img = img;

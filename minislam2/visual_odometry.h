@@ -1,5 +1,5 @@
-#include "feature_manager.hpp"
-#include "util.hpp"
+#include "feature_manager.h"
+#include "util.h"
 
 class VisualOdometry {
    public:

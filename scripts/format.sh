@@ -1,3 +1,3 @@
 #!/bin/bash
-./build.sh
+./scripts/build.sh
 cd build && make format

@@ -7,8 +7,8 @@
 #include <opencv2/imgproc.hpp>
 #include <string>
 
-#include "util.hpp"
-#include "visual_odometry.hpp"
+#include "util.h"
+#include "visual_odometry.h"
 
 using namespace cv;
 
