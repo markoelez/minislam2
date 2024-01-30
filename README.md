@@ -19,7 +19,7 @@ cmake --build .
 run example:
 ```sh
 # build, then
-./build/MiniSLAM
+./build/minislam
 
 # or
 ./scripts/run.sh
