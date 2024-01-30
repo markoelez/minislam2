@@ -32,3 +32,9 @@ run example:
 # or
 ./scripts/run.sh
 ```
+
+
+### Todo
+- make dataset config dynamic
+- add support for mp4 inputs
+- add 3D viewer using Pangolin/OpenGL
