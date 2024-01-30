@@ -1,23 +1,21 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <string>
+#include <thread>
 
+#include "display.h"
 #include "util.h"
 #include "visual_odometry.h"
 
 using namespace cv;
 
 namespace fs = std::filesystem;
-
-void show(Mat img, const std::string window) {
-    imshow(window, img);
-    waitKey(0);
-}
 
 Mat load(const std::string& path) {
     auto img = imread(path, IMREAD_COLOR);
@@ -36,7 +34,7 @@ Point2f fit_point(const int rows, const int cols, Mat mat_3b1) {
 };
 
 int main() {
-    // hardcoded config
+    // TODO: make config dynamic
     std::string base_path = "../eval/test";
 
     const auto fx = 718.856;
@@ -54,6 +52,10 @@ int main() {
 
     auto camera = Camera(fx, fy, cx, cy);
 
+    // Create displays.
+    SDLWindow mapw("Map", tw, th);
+    SDLWindow imgw("Img", w, h);
+
     std::vector<std::string> fns;
     for (const auto& x : fs::directory_iterator(base_path)) {
         fns.emplace_back(x.path());
@@ -64,14 +66,17 @@ int main() {
 
     cv::Mat map = Mat::zeros(tw, th, CV_8UC3);
 
+    SDL_Event e;
     for (size_t i = 0; i < fns.size(); ++i) {
+        poll_sdl(e);
+
         auto img = load(fns[i]);
 
         cv::resize(img, img, cv::Size(w, h));
 
         vo.process(img);
 
-        if (i > 0) show(vo.draw_features(), "MAIN");
+        if (i > 0) imgw.show(vo.draw_features());
 
         vo.commit();
 
@@ -82,7 +87,9 @@ int main() {
         std::string strpos = "(" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ")";
         cv::putText(tmp, strpos, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0,
                     CV_RGB(255, 255, 255), 1.0);
-        show(tmp, "MAP");
+        mapw.show(tmp);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     return 0;

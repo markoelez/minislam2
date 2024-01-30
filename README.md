@@ -4,6 +4,10 @@ Simple implementation of monocular visual odometry.
 
 Note: This is a rewrite of https://github.com/markoelez/minislam.
 
+![alt text](https://github.com/markoelez/minislam2/blob/master/img/img.png?raw=true)
+![alt text](https://github.com/markoelez/minislam2/blob/master/img/map.png?raw=true)
+
+
 ### Usage
 
 build:
