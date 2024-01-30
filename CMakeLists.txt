@@ -8,13 +8,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-anon-enum-enum-conversio
 
 find_package(OpenCV REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(Pangolin 0.8 REQUIRED)
 
-include_directories(${OpenCV_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS})
+include_directories(${OpenCV_INCLUDE_DIRS} ${SDL2_INCLUDE_DIRS} ${Pangolin_INCLUDE_DIRS})
 
 file(GLOB SOURCES "minislam2/*.cc")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${SDL2_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${SDL2_LIBRARIES} pango_display)
 
 file(GLOB_RECURSE ALL_SOURCE_FILES
      "${CMAKE_SOURCE_DIR}/minislam2/*.cpp"
