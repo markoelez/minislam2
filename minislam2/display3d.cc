@@ -12,28 +12,69 @@ void check_gl_error(const char* op) {
     }
 }
 
-pangolin::OpenGlMatrix get_opengl_mat(const cv::Mat& cvMat) {
-    pangolin::OpenGlMatrix matrix;
-    // Ensure cvMat is a 4x4 transformation matrix
-    if (cvMat.rows != 4 || cvMat.cols != 4 || cvMat.type() != CV_64F) {
+pangolin::OpenGlMatrix get_opengl_mat(const cv::Mat& mat) {
+    if (mat.rows != 4 || mat.cols != 4 || mat.type() != CV_64F) {
         throw std::invalid_argument("Input cv::Mat must be a 4x4 double matrix.");
     }
 
+    pangolin::OpenGlMatrix res;
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            matrix.m[j * 4 + i] = cvMat.at<double>(i, j);
+            res.m[j * 4 + i] = mat.at<double>(i, j);
         }
     }
-    return matrix;
+    return res;
 }
 
-Display3d::Display3d(const double w, const double h) {
+void draw_camera(const pangolin::OpenGlMatrix& pose, float r, float g, float b, float psize = 2.0,
+                 float size = 1.0) {
+    glLineWidth(psize);
+    glColor3f(r, g, b);
+
+    glPushMatrix();
+    glMultMatrixd(pose.m);
+
+    glBegin(GL_LINES);
+
+    glVertex3f(0, 0, 0);
+    glVertex3f(size, size, size);
+
+    glVertex3f(0, 0, 0);
+    glVertex3f(-size, size, size);
+
+    glVertex3f(0, 0, 0);
+    glVertex3f(-size, -size, size);
+
+    glVertex3f(0, 0, 0);
+    glVertex3f(size, -size, size);
+
+    glVertex3f(size, size, size);
+    glVertex3f(-size, size, size);
+
+    glVertex3f(-size, size, size);
+    glVertex3f(-size, -size, size);
+
+    glVertex3f(-size, -size, size);
+    glVertex3f(size, -size, size);
+
+    glVertex3f(size, -size, size);
+    glVertex3f(size, size, size);
+
+    glEnd();
+
+    glPopMatrix();
+}
+
+Display3d::Display3d(const double w, const double h) : w(w), h(h){};
+Display3d::~Display3d() {}
+
+void Display3d::init() {
     pangolin::CreateWindowAndBind("Map", w, h);
-    // glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     s_cam = pangolin::OpenGlRenderState(
-        pangolin::ProjectionMatrix(w, h, 718, 718, w / 2, h / 2, 0.1, 10000),
-        pangolin::ModelViewLookAt(0, 0, -3, 0, 0, 0, pangolin::AxisY));
+        pangolin::ProjectionMatrix(w, h, vpf, vpf, w / 2, h / 2, 0.1, 10000),
+        pangolin::ModelViewLookAt(vpx, vpy, vpz, lpx, lpy, lpz, pangolin::AxisY));
 
     // Create interactive view
     d_cam = &pangolin::CreateDisplay()
@@ -44,14 +85,12 @@ Display3d::Display3d(const double w, const double h) {
     d_cam->Resize(pangolin::Viewport(0, 0, w * 2, h * 2));
 }
 
-Display3d::~Display3d() {}
-
 void Display3d::draw(VisualOdometry& vo) {
     std::vector<cv::Mat> poses = vo.get_poses(), translations = vo.get_translations();
 
-    if (!poses.empty()) {
+    if (follow_cam && !poses.empty()) {
         pangolin::OpenGlMatrix latest_pose = get_opengl_mat(poses.back());
-        // s_cam.Follow(latest_pose);
+        s_cam.Follow(latest_pose);
     }
 
     // Clear color and depth buffers
@@ -62,16 +101,26 @@ void Display3d::draw(VisualOdometry& vo) {
     d_cam->Activate(s_cam);
     check_gl_error("init");
 
+    if (poses.size() >= 2) {
+        for (size_t i = 0; i < poses.size() - 1; ++i) {
+            pangolin::OpenGlMatrix glPose = get_opengl_mat(poses[i]);
+            draw_camera(glPose, 0.0, 1.0, 0.0, cam_psize);
+        }
+    }
+
+    if (poses.size() >= 1) {
+        pangolin::OpenGlMatrix glPose = get_opengl_mat(poses.back());
+        draw_camera(glPose, 1.0, 0.0, 0.0, cam_psize);
+    }
+
     glColor3f(0.0, 0.0, 1.0);
-    glLineWidth(2);
+    glLineWidth(path_psize);
     glBegin(GL_LINE_STRIP);
     for (const auto& t : translations) {
-        std::cout << t << std::endl;
         glVertex3d(t.at<double>(0, 0), t.at<double>(1, 0), t.at<double>(2, 0));
     }
     glEnd();
 
-    std::cout << "************************************************************" << std::endl;
     check_gl_error("draw");
 
     pangolin::FinishFrame();

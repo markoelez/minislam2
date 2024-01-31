@@ -10,13 +10,26 @@ class Display3d {
     Display3d(const double w, const double h);
     ~Display3d();
 
+    void init();
+
     void draw(VisualOdometry& vo);
 
    private:
-    const double viewpoint_x = 0;
-    const double viewpoint_y = 50;
-    const double viewpoint_z = -80;
-    const double viewpoint_f = 1000;
+    double w, h;
+
+    const bool follow_cam = false;
+
+    const double cam_psize = 1;
+    const double path_psize = 4;
+
+    const double vpx = 0;
+    const double vpy = 80;
+    const double vpz = -60;
+    const double vpf = 500;
+
+    const double lpx = 0;
+    const double lpy = 0;
+    const double lpz = 60;
 
     pangolin::View* d_cam;
     pangolin::OpenGlRenderState s_cam;
