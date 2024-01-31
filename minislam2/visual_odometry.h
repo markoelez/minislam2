@@ -1,3 +1,5 @@
+#pragma once
+
 #include "feature_manager.h"
 #include "util.h"
 
@@ -14,6 +16,10 @@ class VisualOdometry {
     void commit();
 
     Mat draw_features();
+
+    std::vector<Mat> get_poses();
+
+    std::vector<Mat> get_translations();
 
     std::tuple<cv::Mat, cv::Mat> estimate_pose();
 
@@ -33,6 +39,7 @@ class VisualOdometry {
     Mat cur_R;
 
     std::vector<Mat> poses;
+    std::vector<Mat> translations;
 
     double scale;
 };

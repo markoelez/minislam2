@@ -1,9 +1,26 @@
+
 #include "visual_odometry.h"
 
 #include <iostream>
 #include <opencv2/calib3d.hpp>
 
 #include "util.h"
+
+std::vector<Mat> VisualOdometry::get_poses() { return poses; };
+
+std::vector<Mat> VisualOdometry::get_translations() { return translations; };
+
+cv::Mat pose_Rt(const cv::Mat& R, const cv::Mat& t) {
+    cv::Mat ret = cv::Mat::eye(4, 4, CV_64F);  // Create a 4x4 identity matrix
+
+    // Copy R into the top-left 3x3 of ret
+    R.copyTo(ret(cv::Rect(0, 0, 3, 3)));
+
+    // Copy t into the first three rows of the fourth column of ret
+    t.copyTo(ret(cv::Rect(3, 0, 1, 3)));
+
+    return ret;
+}
 
 void VisualOdometry::process(Mat img) {
     cur_img = img;
@@ -22,6 +39,11 @@ void VisualOdometry::process(Mat img) {
         // Update current position.
         cur_t = cur_t + scale * (cur_R * t);
         cur_R = cur_R * R;
+
+        // Update state.
+        translations.push_back(cur_t.clone());
+        cv::Mat pose = pose_Rt(cur_R, cur_t);
+        poses.push_back(pose);
     }
 };
 

@@ -10,6 +10,7 @@
 #include <thread>
 
 #include "display.h"
+#include "display3d.h"
 #include "util.h"
 #include "visual_odometry.h"
 
@@ -35,7 +36,7 @@ Point2f fit_point(const int rows, const int cols, Mat mat_3b1) {
 
 int main() {
     // TODO: make config dynamic
-    std::string base_path = "../eval/test";
+    std::string base_path = "../eval/test2";
 
     const auto fx = 718.856;
     const auto fy = 718.856;
@@ -48,9 +49,11 @@ int main() {
     const auto tw = 800;
     const auto th = 800;
 
-    const auto scale = 0.8;
+    const auto scale = 0.4;
 
     auto camera = Camera(fx, fy, cx, cy);
+
+    Display3d display(1024, 550);
 
     // Create displays.
     SDLWindow mapw("Map", tw, th);
@@ -88,8 +91,9 @@ int main() {
         cv::putText(tmp, strpos, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.0,
                     CV_RGB(255, 255, 255), 1.0);
         mapw.show(tmp);
+        display.draw(vo);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     return 0;
